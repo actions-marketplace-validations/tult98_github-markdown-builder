@@ -1,16 +1,16 @@
 {
-  "name": "typescript-action",
-  "description": "GitHub Actions TypeScript template",
-  "version": "0.0.0",
+  "name": "github-markdown-builder",
+  "description": "A GitHub Action to build dynamic markdown",
+  "version": "v1.0.0",
   "author": "Matthew Thomas",
   "private": true,
-  "homepage": "https://github.com/actions/typescript-action",
+  "homepage": "https://github.com/Ma11hewThomas/github-markdown-builder",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/Ma11hewThomas/github-markdown-builder.git"
   },
   "bugs": {
-    "url": "https://github.com/actions/typescript-action/issues"
+    "url": "https://github.com/Ma11hewThomas/github-markdown-builder/issues"
   },
   "keywords": [
     "actions",
