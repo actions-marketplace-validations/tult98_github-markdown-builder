@@ -1,4 +1,4 @@
-name: 'mardown-builder'
+name: 'markdown-builder'
 description:
   'A GitHub Action to build markdown summaries for GitHub Actions and pull
   requests using Handlebars templates.'
