@@ -1,0 +1,35 @@
+name: 'Test GitHubMarkdownBuilder Action'
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-action:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Run GitHubSummaryBuilder Action Locally
+        id: test-action
+        uses: ./
+        with:
+          template-file-path: './templates/example/example.hbs'
+          json-file-path: './templates/example/example.json'
+          pull-request: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print Output Summary
+        run: echo "${{ steps.test-action.outputs.markdown }}"

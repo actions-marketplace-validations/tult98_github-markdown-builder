@@ -1,0 +1,37 @@
+name: 'mardown-builder'
+description:
+  'A GitHub Action to build markdown summaries for GitHub Actions and pull
+  requests using Handlebars templates.'
+author: 'ctrf-io'
+
+# Add your action's branding here. This will appear on the GitHub Marketplace.
+branding:
+  icon: 'file'
+  color: 'blue'
+
+# Define your inputs here.
+inputs:
+  template-file-path:
+    description: 'Path to the Handlebars template file to use.'
+    required: true
+  json-file-path:
+    description: 'Path to the optional JSON file for template data.'
+    required: false
+  summary:
+    description: 'Post markdown to GitHub Action summary'
+    default: true
+    require: false
+  pull-request:
+    description: 'Comment markdown on Pull Request'
+    default: false
+    require: false
+
+# Define your outputs here, if necessary.
+outputs:
+  summary:
+    description: 'The generated markdown summary.'
+
+# Specify the environment and entry point for the action.
+runs:
+  using: 'node20'
+  main: dist/index.js
