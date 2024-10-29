@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Generate Markdown Summary
-        uses: ctrf-io/markdown-builder@v1
+        uses: Ma11hewThomas/markdown-builder@v1
         with:
           template-file-path: './path/to/template.hbs'
           json-file-path: './path/to/data.json' # Optional
@@ -74,6 +74,22 @@ within the workflow logs.
 To add a comment directly to an open pull request, set pull-request: true.
 Ensure your workflow is triggered by an event that provides a pull request
 context (e.g., pull_request or pull_request_target events).
+
+You must set the `GITHUB_TOKEN`, which is typically available by default in
+GitHub Actions, but it needs to have write permissions for pull requests. For
+guidance on configuring these permissions, please see GitHub's
+[documentation](https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication#permissions-for-the-github_token).
+
+```yaml
+- name: Comment On Pull Request
+  uses: Ma11hewThomas/markdown-builder@v1
+  with:
+    template-file-path: './path/to/template.hbs'
+    json-file-path: './path/to/data.json' # Optional
+    pull-request: true # Set to true to comment on PR if available
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
 
 ## Using Handlebars Templates with Custom Data
 
