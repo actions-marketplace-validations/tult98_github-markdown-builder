@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Generate Markdown Summary
-        uses: Ma11hewThomas/markdown-builder@v1
+        uses: Ma11hewThomas/github-markdown-builder@v1.0.0
         with:
           template-file-path: './path/to/template.hbs'
           json-file-path: './path/to/data.json' # Optional
@@ -82,7 +82,7 @@ guidance on configuring these permissions, please see GitHub's
 
 ```yaml
 - name: Comment On Pull Request
-  uses: Ma11hewThomas/markdown-builder@v1
+  uses: Ma11hewThomas/github-markdown-builder@v1.0.0
   with:
     template-file-path: './path/to/template.hbs'
     json-file-path: './path/to/data.json' # Optional

@@ -2,7 +2,7 @@ name: 'markdown-builder'
 description:
   'A GitHub Action to build markdown summaries for GitHub Actions and pull
   requests using Handlebars templates.'
-author: 'ctrf-io'
+author: 'Ma11hewThomas'
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
