@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Generate Markdown Summary
-        uses: Ma11hewThomas/github-markdown-builder@v1.0.0
+        uses: Ma11hewThomas/github-markdown-builder@v1
         with:
           template-file-path: './path/to/template.hbs'
           json-file-path: './path/to/data.json' # Optional
