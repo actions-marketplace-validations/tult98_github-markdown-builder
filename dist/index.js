@@ -38315,7 +38315,6 @@ exports.createGitHubClient = createGitHubClient;
 exports.addCommentToPullRequest = addCommentToPullRequest;
 exports.updateCommentOnPullRequest = updateCommentOnPullRequest;
 const core = __importStar(__nccwpck_require__(7484));
-const MAX_RETRIES = 5;
 async function createGitHubClient() {
     const { Octokit } = await __nccwpck_require__.e(/* import() */ 145).then(__nccwpck_require__.bind(__nccwpck_require__, 6145));
     const token = core.getInput('repo-token') || process.env.GITHUB_TOKEN;
@@ -38334,34 +38333,15 @@ async function addCommentToPullRequest(owner, repo, pull_number, body) {
     });
     return data;
 }
-async function updateCommentOnPullRequest({ owner, repo, comment_id, body, etag }) {
+async function updateCommentOnPullRequest({ owner, repo, comment_id, body }) {
     const octokit = await createGitHubClient();
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-        try {
-            const { data } = await octokit.request('PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}', {
-                owner,
-                repo,
-                comment_id,
-                body,
-                headers: etag ? { 'If-Match': etag } : undefined
-            });
-            return data; // success!
-        }
-        catch (error) {
-            if (error.status === 412 && attempt < MAX_RETRIES) {
-                console.warn(`ETag mismatch on attempt ${attempt}, retrying...`);
-                // Optional: get updated etag here if desired
-                await wait(300 * attempt); // exponential backoff
-            }
-            else {
-                throw error;
-            }
-        }
-    }
-    throw new Error('Failed to update comment after max retries');
-}
-async function wait(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    const { data } = await octokit.issues.updateComment({
+        owner,
+        repo,
+        comment_id,
+        body
+    });
+    return data;
 }
 
 
@@ -38411,7 +38391,6 @@ async function runAction() {
         const jsonFilePath = core.getInput('json-file-path');
         const summary = core.getInput('summary');
         const pullRequest = core.getInput('pull-request');
-        const etag = core.getInput('etag');
         const commentId = core.getInput('comment-id');
         const templateSource = (0, file_utils_1.readTemplate)(templatePath);
         const jsonData = jsonFilePath ? (0, file_utils_1.readJsonFile)(jsonFilePath) : {};
@@ -38425,7 +38404,6 @@ async function runAction() {
                     owner: github_1.context.repo.owner,
                     repo: github_1.context.repo.repo,
                     comment_id: Number(commentId),
-                    etag,
                     body: markdown
                 });
             }
