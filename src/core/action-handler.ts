@@ -1,9 +1,12 @@
 import * as core from '@actions/core'
-import { readTemplate, readJsonFile } from '../utils/file-utils'
-import { generateMarkdown } from '../utils/markdown-utils'
-import { getAllGitHubContext } from 'src/utils/github-utils'
-import { addCommentToPullRequest } from 'src/client/github'
 import { context } from '@actions/github'
+import {
+  addCommentToPullRequest,
+  updateCommentOnPullRequest
+} from 'src/client/github'
+import { getAllGitHubContext } from 'src/utils/github-utils'
+import { readJsonFile, readTemplate } from '../utils/file-utils'
+import { generateMarkdown } from '../utils/markdown-utils'
 
 export async function runAction(): Promise<void> {
   try {
@@ -13,6 +16,8 @@ export async function runAction(): Promise<void> {
     const jsonFilePath = core.getInput('json-file-path')
     const summary = core.getInput('summary')
     const pullRequest = core.getInput('pull-request')
+    const etag = core.getInput('etag')
+    const commentId = core.getInput('comment-id')
 
     const templateSource = readTemplate(templatePath)
     const jsonData = jsonFilePath ? readJsonFile(jsonFilePath) : {}
@@ -20,12 +25,26 @@ export async function runAction(): Promise<void> {
     const markdown = generateMarkdown(templateSource, jsonData)
 
     if (pullRequest && context.eventName === 'pull_request') {
-      await addCommentToPullRequest(
-        context.repo.owner,
-        context.repo.repo,
-        context.issue.number,
-        markdown
-      )
+      if (commentId) {
+        if (isNaN(Number(commentId))) {
+          throw new Error('comment-id must be a number')
+        }
+
+        await updateCommentOnPullRequest({
+          owner: context.repo.owner,
+          repo: context.repo.repo,
+          comment_id: Number(commentId),
+          etag,
+          body: markdown
+        })
+      } else {
+        await addCommentToPullRequest(
+          context.repo.owner,
+          context.repo.repo,
+          context.issue.number,
+          markdown
+        )
+      }
     }
 
     console.log('Generated Markdown:')

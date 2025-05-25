@@ -25,6 +25,14 @@ inputs:
     description: 'Comment markdown on Pull Request'
     default: false
     require: false
+  comment-id:
+    description: 'The ID of the comment to update'
+    required: false
+  etag:
+    description:
+      'If the etag is provided, only update the comment if the etag matches,
+      otherwise, retry the update process for 5 times'
+    required: false
 
 # Define your outputs here, if necessary.
 outputs:
