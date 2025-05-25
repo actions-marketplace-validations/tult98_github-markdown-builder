@@ -2,7 +2,7 @@
   "name": "github-markdown-builder",
   "description": "A GitHub Action to build dynamic markdown",
   "version": "1.0.0",
-  "author": "Matthew Thomas",
+  "author": "Tu Le",
   "private": true,
   "homepage": "https://github.com/Ma11hewThomas/github-markdown-builder",
   "repository": {
