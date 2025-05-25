@@ -31,14 +31,35 @@ export async function updateCommentOnPullRequest({
   owner,
   repo,
   comment_id,
-  body
+  body,
+  refreshMessagePosition,
+  issueNumber
 }: {
   owner: string
   repo: string
   comment_id: number
   body: string
+  refreshMessagePosition: boolean
+  issueNumber: number
 }): Promise<any> {
   const octokit = await createGitHubClient()
+
+  if (refreshMessagePosition) {
+    await octokit.issues.deleteComment({
+      owner,
+      repo,
+      comment_id
+    })
+
+    const { data } = await octokit.issues.createComment({
+      owner,
+      repo,
+      issue_number: issueNumber,
+      body
+    })
+
+    return data
+  }
 
   const { data } = await octokit.issues.updateComment({
     owner,
@@ -46,5 +67,6 @@ export async function updateCommentOnPullRequest({
     comment_id,
     body
   })
+
   return data
 }

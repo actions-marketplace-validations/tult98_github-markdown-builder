@@ -17,6 +17,7 @@ export async function runAction(): Promise<void> {
     const summary = core.getInput('summary')
     const pullRequest = core.getInput('pull-request')
     const commentId = core.getInput('comment-id')
+    const refreshMessagePosition = core.getInput('refresh-message-position')
 
     const templateSource = readTemplate(templatePath)
     const jsonData = jsonFilePath ? readJsonFile(jsonFilePath) : {}
@@ -33,7 +34,9 @@ export async function runAction(): Promise<void> {
           owner: context.repo.owner,
           repo: context.repo.repo,
           comment_id: Number(commentId),
-          body: markdown
+          body: markdown,
+          refreshMessagePosition: refreshMessagePosition === 'true',
+          issueNumber: context.issue.number
         })
       } else {
         await addCommentToPullRequest(

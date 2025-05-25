@@ -28,6 +28,10 @@ inputs:
   comment-id:
     description: 'The ID of the comment to update'
     required: false
+  refresh-message-position:
+    description: 'Should the message be refreshed at the bottom of the PR?'
+    default: false
+    required: false
 
 # Define your outputs here, if necessary.
 outputs:

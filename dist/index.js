@@ -38333,8 +38333,22 @@ async function addCommentToPullRequest(owner, repo, pull_number, body) {
     });
     return data;
 }
-async function updateCommentOnPullRequest({ owner, repo, comment_id, body }) {
+async function updateCommentOnPullRequest({ owner, repo, comment_id, body, refreshMessagePosition, issueNumber }) {
     const octokit = await createGitHubClient();
+    if (refreshMessagePosition) {
+        await octokit.issues.deleteComment({
+            owner,
+            repo,
+            comment_id
+        });
+        const { data } = await octokit.issues.createComment({
+            owner,
+            repo,
+            issue_number: issueNumber,
+            body
+        });
+        return data;
+    }
     const { data } = await octokit.issues.updateComment({
         owner,
         repo,
@@ -38392,6 +38406,7 @@ async function runAction() {
         const summary = core.getInput('summary');
         const pullRequest = core.getInput('pull-request');
         const commentId = core.getInput('comment-id');
+        const refreshMessagePosition = core.getInput('refresh-message-position');
         const templateSource = (0, file_utils_1.readTemplate)(templatePath);
         const jsonData = jsonFilePath ? (0, file_utils_1.readJsonFile)(jsonFilePath) : {};
         const markdown = (0, markdown_utils_1.generateMarkdown)(templateSource, jsonData);
@@ -38404,7 +38419,9 @@ async function runAction() {
                     owner: github_1.context.repo.owner,
                     repo: github_1.context.repo.repo,
                     comment_id: Number(commentId),
-                    body: markdown
+                    body: markdown,
+                    refreshMessagePosition: refreshMessagePosition === 'true',
+                    issueNumber: github_1.context.issue.number
                 });
             }
             else {
