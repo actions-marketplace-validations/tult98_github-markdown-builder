@@ -47,10 +47,16 @@ export async function runAction(): Promise<void> {
       }
     }
 
+    console.log('DEBUG: templateSource', templateSource)
+    console.log('DEBUG: jsonData', jsonData)
+    console.log('DEBUG: markdown', markdown)
+    console.log('DEBUG: pullRequest', pullRequest)
+    console.log('DEBUG: eventName', context.eventName)
+    console.log('DEBUG: commentId', commentId)
+
     console.log('Generated Markdown:')
     console.log(markdown)
-
-    console.log('summary' + summary)
+    console.log('summary:', summary)
 
     if (summary) core.summary.addRaw(markdown).write()
 
