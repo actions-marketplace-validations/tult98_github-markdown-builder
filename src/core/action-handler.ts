@@ -16,7 +16,6 @@ export async function runAction(): Promise<void> {
     const jsonFilePath = core.getInput('json-file-path')
     const summary = core.getInput('summary')
     const pullRequest = core.getInput('pull-request')
-    const etag = core.getInput('etag')
     const commentId = core.getInput('comment-id')
 
     const templateSource = readTemplate(templatePath)
@@ -34,7 +33,6 @@ export async function runAction(): Promise<void> {
           owner: context.repo.owner,
           repo: context.repo.repo,
           comment_id: Number(commentId),
-          etag,
           body: markdown
         })
       } else {
