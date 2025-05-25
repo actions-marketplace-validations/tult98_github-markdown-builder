@@ -38313,7 +38313,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createGitHubClient = createGitHubClient;
 exports.addCommentToPullRequest = addCommentToPullRequest;
+exports.updateCommentOnPullRequest = updateCommentOnPullRequest;
 const core = __importStar(__nccwpck_require__(7484));
+const MAX_RETRIES = 5;
 async function createGitHubClient() {
     const { Octokit } = await __nccwpck_require__.e(/* import() */ 145).then(__nccwpck_require__.bind(__nccwpck_require__, 6145));
     const token = core.getInput('repo-token') || process.env.GITHUB_TOKEN;
@@ -38331,6 +38333,35 @@ async function addCommentToPullRequest(owner, repo, pull_number, body) {
         body
     });
     return data;
+}
+async function updateCommentOnPullRequest({ owner, repo, comment_id, body, etag }) {
+    const octokit = await createGitHubClient();
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        try {
+            const { data } = await octokit.request('PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}', {
+                owner,
+                repo,
+                comment_id,
+                body,
+                headers: etag ? { 'If-Match': etag } : undefined
+            });
+            return data; // success!
+        }
+        catch (error) {
+            if (error.status === 412 && attempt < MAX_RETRIES) {
+                console.warn(`ETag mismatch on attempt ${attempt}, retrying...`);
+                // Optional: get updated etag here if desired
+                await wait(300 * attempt); // exponential backoff
+            }
+            else {
+                throw error;
+            }
+        }
+    }
+    throw new Error('Failed to update comment after max retries');
+}
+async function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 
@@ -38367,11 +38398,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.runAction = runAction;
 const core = __importStar(__nccwpck_require__(7484));
+const github_1 = __nccwpck_require__(3228);
+const github_2 = __nccwpck_require__(3208);
+const github_utils_1 = __nccwpck_require__(5210);
 const file_utils_1 = __nccwpck_require__(2291);
 const markdown_utils_1 = __nccwpck_require__(4680);
-const github_utils_1 = __nccwpck_require__(5210);
-const github_1 = __nccwpck_require__(3208);
-const github_2 = __nccwpck_require__(3228);
 async function runAction() {
     try {
         const templatePath = core.getInput('template-file-path', {
@@ -38380,15 +38411,37 @@ async function runAction() {
         const jsonFilePath = core.getInput('json-file-path');
         const summary = core.getInput('summary');
         const pullRequest = core.getInput('pull-request');
+        const etag = core.getInput('etag');
+        const commentId = core.getInput('comment-id');
         const templateSource = (0, file_utils_1.readTemplate)(templatePath);
         const jsonData = jsonFilePath ? (0, file_utils_1.readJsonFile)(jsonFilePath) : {};
         const markdown = (0, markdown_utils_1.generateMarkdown)(templateSource, jsonData);
-        if (pullRequest && github_2.context.eventName === 'pull_request') {
-            await (0, github_1.addCommentToPullRequest)(github_2.context.repo.owner, github_2.context.repo.repo, github_2.context.issue.number, markdown);
+        if (pullRequest && github_1.context.eventName === 'pull_request') {
+            if (commentId) {
+                if (isNaN(Number(commentId))) {
+                    throw new Error('comment-id must be a number');
+                }
+                await (0, github_2.updateCommentOnPullRequest)({
+                    owner: github_1.context.repo.owner,
+                    repo: github_1.context.repo.repo,
+                    comment_id: Number(commentId),
+                    etag,
+                    body: markdown
+                });
+            }
+            else {
+                await (0, github_2.addCommentToPullRequest)(github_1.context.repo.owner, github_1.context.repo.repo, github_1.context.issue.number, markdown);
+            }
         }
+        console.log('DEBUG: templateSource', templateSource);
+        console.log('DEBUG: jsonData', jsonData);
+        console.log('DEBUG: markdown', markdown);
+        console.log('DEBUG: pullRequest', pullRequest);
+        console.log('DEBUG: eventName', github_1.context.eventName);
+        console.log('DEBUG: commentId', commentId);
         console.log('Generated Markdown:');
         console.log(markdown);
-        console.log('summary' + summary);
+        console.log('summary:', summary);
         if (summary)
             core.summary.addRaw(markdown).write();
         (0, github_utils_1.getAllGitHubContext)();
@@ -38416,7 +38469,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.runLocal = runLocal;
 const file_utils_1 = __nccwpck_require__(2291);
 const markdown_utils_1 = __nccwpck_require__(4680);
-async function runLocal() {
+function runLocal() {
     try {
         const templatePath = process.argv[2] || './templates/example.hbs';
         const jsonFilePath = process.argv[3] || null;
@@ -41008,7 +41061,7 @@ const local_handler_1 = __nccwpck_require__(2069);
 async function run() {
     const isLocal = !process.env.GITHUB_ACTIONS;
     if (isLocal) {
-        await (0, local_handler_1.runLocal)();
+        (0, local_handler_1.runLocal)();
     }
     else {
         await (0, action_handler_1.runAction)();
