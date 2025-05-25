@@ -38407,6 +38407,8 @@ async function runAction() {
         const pullRequest = core.getInput('pull-request');
         const commentId = core.getInput('comment-id');
         const refreshMessagePosition = core.getInput('refresh-message-position');
+        console.log('DEBUG: refreshMessagePosition', refreshMessagePosition);
+        console.log('DEBUG: refreshMessagePosition type', typeof refreshMessagePosition);
         const templateSource = (0, file_utils_1.readTemplate)(templatePath);
         const jsonData = jsonFilePath ? (0, file_utils_1.readJsonFile)(jsonFilePath) : {};
         const markdown = (0, markdown_utils_1.generateMarkdown)(templateSource, jsonData);
@@ -38428,12 +38430,6 @@ async function runAction() {
                 await (0, github_2.addCommentToPullRequest)(github_1.context.repo.owner, github_1.context.repo.repo, github_1.context.issue.number, markdown);
             }
         }
-        console.log('DEBUG: templateSource', templateSource);
-        console.log('DEBUG: jsonData', jsonData);
-        console.log('DEBUG: markdown', markdown);
-        console.log('DEBUG: pullRequest', pullRequest);
-        console.log('DEBUG: eventName', github_1.context.eventName);
-        console.log('DEBUG: commentId', commentId);
         console.log('Generated Markdown:');
         console.log(markdown);
         console.log('summary:', summary);

@@ -19,6 +19,9 @@ export async function runAction(): Promise<void> {
     const commentId = core.getInput('comment-id')
     const refreshMessagePosition = core.getInput('refresh-message-position')
 
+    console.log('DEBUG: refreshMessagePosition', refreshMessagePosition)
+    console.log('DEBUG: refreshMessagePosition type', typeof refreshMessagePosition)
+
     const templateSource = readTemplate(templatePath)
     const jsonData = jsonFilePath ? readJsonFile(jsonFilePath) : {}
 
@@ -47,13 +50,6 @@ export async function runAction(): Promise<void> {
         )
       }
     }
-
-    console.log('DEBUG: templateSource', templateSource)
-    console.log('DEBUG: jsonData', jsonData)
-    console.log('DEBUG: markdown', markdown)
-    console.log('DEBUG: pullRequest', pullRequest)
-    console.log('DEBUG: eventName', context.eventName)
-    console.log('DEBUG: commentId', commentId)
 
     console.log('Generated Markdown:')
     console.log(markdown)
