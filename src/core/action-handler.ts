@@ -23,7 +23,7 @@ export async function runAction(): Promise<void> {
     const inputs = getActionInputs()
     validateInputs(inputs)
 
-    const templateSource = readTemplate('../templates/ci-summary-template.hbs')
+    const templateSource = readTemplate('templates/ci-summary-template.hbs')
     const jsonData = inputs.initJsonFilePath
       ? readJsonFile(inputs.initJsonFilePath)
       : {}

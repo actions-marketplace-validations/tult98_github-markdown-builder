@@ -38416,7 +38416,7 @@ async function runAction() {
     try {
         const inputs = getActionInputs();
         validateInputs(inputs);
-        const templateSource = (0, file_utils_1.readTemplate)('../templates/ci-summary-template.hbs');
+        const templateSource = (0, file_utils_1.readTemplate)('templates/ci-summary-template.hbs');
         const jsonData = inputs.initJsonFilePath
             ? (0, file_utils_1.readJsonFile)(inputs.initJsonFilePath)
             : {};
@@ -38820,14 +38820,18 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.readTemplate = readTemplate;
 exports.readJsonFile = readJsonFile;
 const fs = __importStar(__nccwpck_require__(9896));
+const path = __importStar(__nccwpck_require__(6928));
 function readTemplate(filePath) {
     if (!filePath.endsWith('.hbs') && !filePath.endsWith('.md')) {
         throw new Error(`File must have a handlebars or markdown extension: ${filePath}`);
     }
-    if (!fs.existsSync(filePath)) {
-        throw new Error(`Template file not found: ${filePath}`);
+    // Resolve path relative to the action's directory structure
+    const actionDir = path.dirname(require.resolve('../index.js'));
+    const absolutePath = path.join(actionDir, filePath);
+    if (!fs.existsSync(absolutePath)) {
+        throw new Error(`Template file not found: ${absolutePath}`);
     }
-    return fs.readFileSync(filePath, 'utf-8');
+    return fs.readFileSync(absolutePath, 'utf-8');
 }
 function readJsonFile(filePath) {
     if (!fs.existsSync(filePath)) {
