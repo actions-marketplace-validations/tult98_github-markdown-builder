@@ -1,8 +1,8 @@
-name: 'Github Markdown Builder'
+name: 'EH CI Summary Builder'
 description:
-  'A GitHub Action to build markdown summaries for GitHub Actions and pull
-  requests using Handlebars templates.'
-author: 'Ma11hewThomas'
+  'A Github Action to build CI Summary for a pull request using Handlebars
+  templates for EH'
+author: 'tult98'
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
@@ -11,27 +11,32 @@ branding:
 
 # Define your inputs here.
 inputs:
-  template-file-path:
-    description: 'Path to the Handlebars template file to use.'
-    required: true
-  json-file-path:
-    description: 'Path to the optional JSON file for template data.'
+  init-json-file-path:
+    description: 'Path to the JSON file to initialize the CI summary.'
     required: false
+  workflow-name:
+    description: 'The name of the workflow that need to be reported'
+    required: false
+  workflow-required:
+    description: 'Whether the workflow is required or optional'
+    required: false
+  workflow-status:
+    description: 'The status of the workflow'
+    required: false
+  workflow-run-url:
+    description: 'The URL of the workflow run'
+    required: false
+  workflow-run-errors:
+    description: 'The errors of the workflow run'
+    required: false
+  pull-request:
+    description: 'Create a pull request comment or not'
+    required: false
+    default: true
   summary:
     description: 'Post markdown to GitHub Action summary'
-    default: true
-    require: false
-  pull-request:
-    description: 'Comment markdown on Pull Request'
-    default: false
-    require: false
-  comment-id:
-    description: 'The ID of the comment to update'
     required: false
-  refresh-message-position:
-    description: 'Should the message be refreshed at the bottom of the PR?'
     default: false
-    required: false
 
 # Define your outputs here, if necessary.
 outputs:

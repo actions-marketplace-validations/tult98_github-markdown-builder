@@ -1,4 +1,5 @@
 import * as core from '@actions/core'
+import { Context } from '@actions/github/lib/context'
 
 export async function createGitHubClient(): Promise<any> {
   const { Octokit } = await import('@octokit/rest')
@@ -69,4 +70,23 @@ export async function updateCommentOnPullRequest({
   })
 
   return data
+}
+
+export const getCiSummaryComment = async (context: Context): Promise<any> => {
+  const octokit = await createGitHubClient()
+
+  const marker = '<!-- ci-summary-start -->'
+
+  const comments = await octokit.paginate(octokit.issues.listComments, {
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    issue_number: context.issue.number,
+    per_page: 100
+  })
+
+  const ciSummaryComment = comments.find((comment: any) =>
+    comment.body.includes(marker)
+  )
+
+  return ciSummaryComment
 }
